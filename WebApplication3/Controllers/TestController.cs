@@ -26,6 +26,7 @@ namespace WebApplication3.Controllers
             return View();
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(Person person)
         {
             if (ModelState.IsValid)
@@ -43,6 +44,7 @@ namespace WebApplication3.Controllers
         }
         
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, Person person)
         {
             if (ModelState.IsValid)
@@ -66,6 +68,7 @@ namespace WebApplication3.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, FormCollection form)
         {
             data.Remove(data.First(p=>p.Id==id));
