@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Web.Mvc;
+using WebApplication3.Models;
+
+namespace WebApplication3.Controllers
+{
+    public class ReportsController : Controller
+    {
+        ContosoUniversityEntities db = new ContosoUniversityEntities();
+        StringBuilder sb = new StringBuilder();
+        
+        //ctor就可以快速寫出
+        public ReportsController()
+        {
+            db.Database.Log = (msg) =>
+            {
+                sb.AppendLine(msg);
+                sb.AppendLine("------------------------");
+            };
+        }
+
+        // GET: Reports
+        public ActionResult Index()
+        {
+            return View();
+        }
+       
+        public ActionResult CoursesReport1()
+        {
+            var data = (from c in db.Course
+                       select new CourseReport1VM()
+                       {
+                           CourseID = c.CourseID,
+                           CourseName = c.Title,
+                           StudentCount = c.Enrollments.Count(),
+                           TeacherCount = c.Teachers.Count(),
+                           AvgGrade = c.Enrollments.Where(e => e.Grade.HasValue).Average(e => e.Grade.Value)
+                       }).ToList();
+            ViewBag.SQL = sb.ToString();
+            return View(data);
+        }
+        public ActionResult CoursesReport2()
+        {
+            var data = db.Database.SqlQuery<CourseReport1VM>(@"
+SELECT
+    Course.CourseID, 
+    Course.Title AS CourseName,
+	(SELECT COUNT(CourseID) FROM CourseInstructor WHERE (CourseID = Course.CourseID)) AS TeacherCount,
+	(SELECT COUNT(CourseID) FROM Enrollment WHERE (Course.CourseID = Enrollment.CourseID)) AS StudentCount,
+	(SELECT AVG(Cast(Grade as Float)) FROM Enrollment WHERE (Course.CourseID = Enrollment.CourseID)) AS AvgGrade
+FROM   Course").ToList();
+
+            ViewBag.SQL = sb.ToString();
+
+            return View("CoursesReport1", data);
+        }
+        public ActionResult CoursesReport3(int id)
+        {
+            var data = db.Database.SqlQuery<CourseReport1VM>(@"
+SELECT
+    Course.CourseID, 
+    Course.Title AS CourseName,
+	(SELECT COUNT(CourseID) FROM CourseInstructor WHERE (CourseID = Course.CourseID)) AS TeacherCount,
+	(SELECT COUNT(CourseID) FROM Enrollment WHERE (Course.CourseID = Enrollment.CourseID)) AS StudentCount,
+	(SELECT AVG(Cast(Grade as Float)) FROM Enrollment WHERE (Course.CourseID = Enrollment.CourseID)) AS AvgGrade
+FROM   Course
+WHERE  Course.CourseID = @p0", id).ToList();
+
+            ViewBag.SQL = sb.ToString();
+
+            return View("CoursesReport1", data);
+        }
+
+        public ActionResult CoursesReport4(int id)
+        {
+            var data = db.GetCourseReport(id).First();
+            ViewBag.SQL = sb.ToString();
+            return View(data);
+        }
+        public ActionResult CoursesReport5(int id)
+        {
+            var data = db.Database.SqlQuery<CourseReport1VM>("EXEC GetCourseReport @p0", id).ToList();
+            ViewBag.SQL = sb.ToString();
+            return View("CoursesReport1", data);
+        }
+    }
+}
