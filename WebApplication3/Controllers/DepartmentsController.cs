@@ -66,7 +66,7 @@ namespace WebApplication3.Controllers
             }
             var dept = db.Department.Find(ID);
             ViewBag.InstructorID = new SelectList(db.Person, "ID", "FirstName", dept.InstructorID);
-            return View(department);
+            return View(dept);
         }
         public ActionResult Details(int? ID)
         {

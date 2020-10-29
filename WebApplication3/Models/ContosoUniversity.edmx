@@ -215,7 +215,7 @@
           </Key>
           <Property Name="DepartmentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Budget" Type="Int16" Nullable="false" />
+          <Property Name="Budget" Type="Decimal" Nullable="false" Scale="4" Precision="19" />
           <Property Name="StartDate" Type="DateTime" Precision="3" />
           <Property Name="InstructorID" Type="Int32" />
           <NavigationProperty Name="Course" Relationship="Self.FK_dbo_Course_dbo_Department_DepartmentID" FromRole="Department" ToRole="Course" />
