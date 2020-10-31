@@ -32,6 +32,7 @@ namespace WebApplication3.Models
         public virtual DbSet<Enrollment> Enrollment { get; set; }
         public virtual DbSet<OfficeAssignment> OfficeAssignment { get; set; }
         public virtual DbSet<Person> Person { get; set; }
+        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
     
         public virtual ObjectResult<GetCourseReport_Result> GetCourseReport(Nullable<int> courseID)
         {

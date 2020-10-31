@@ -11,7 +11,7 @@ using WebApplication3.Models;
 
 namespace WebApplication3.Controllers
 {
-    public class CoursesController : Controller
+    public class CoursesController : BaseController
     {
         private ContosoUniversityEntities db = new ContosoUniversityEntities();
 

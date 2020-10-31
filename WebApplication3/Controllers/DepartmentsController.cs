@@ -2,23 +2,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using WebApplication3.Models;
 
 namespace WebApplication3.Controllers
 {
-    public class DepartmentsController : Controller
+    public class DepartmentsController : BaseController
     {
-        ContosoUniversityEntities db = new ContosoUniversityEntities();
+        //ContosoUniversityEntities db = new ContosoUniversityEntities();
+        DepartmentRepository repo;
+        PersonRepository repoPerson;
+
+        public DepartmentsController()
+        {
+            repo = RepositoryHelper.GetDepartmentRepository();
+            repoPerson = RepositoryHelper.GetPersonRepository(repo.UnitOfWork);
+        }
+
         // GET: Department
         public ActionResult Index()
         {
-            return View(db.Department);
+            return View(repo.All());
         }
         public ActionResult Create()
         {
-            ViewBag.InstructorID = new SelectList(db.Person.OrderBy(p => p.FirstName), "ID", "FirstName");
+            ViewBag.InstructorID = new SelectList(repoPerson.All().OrderBy(p => p.FirstName), "ID", "FirstName");
             return View();
         }
 
@@ -28,13 +38,11 @@ namespace WebApplication3.Controllers
             if (ModelState.IsValid)
             {
                 //db.Department.Add(department);
-                var c = db.Department.Create();
-                c.InjectFrom(department);
-                db.Department.Add(c);
-                db.SaveChanges();
+                repo.Add(department);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            ViewBag.InstructorID = new SelectList(db.Person.OrderBy(p => p.FirstName), "ID", "FirstName");
+            ViewBag.InstructorID = new SelectList(repoPerson.All().OrderBy(p => p.FirstName), "ID", "FirstName");
 
             return View();
         }
@@ -45,9 +53,9 @@ namespace WebApplication3.Controllers
             {
                 return HttpNotFound();
             }
-            var dept = db.Department.Find(ID);
-            ViewBag.InstructorID = new SelectList(db.Person, "ID", "FirstName",dept.InstructorID);
-            return View(db.Department.Find(ID.Value));
+            var dept = repo.Get單一筆部門資料(ID.Value);
+            ViewBag.InstructorID = new SelectList(repoPerson.All(), "ID", "FirstName",dept.InstructorID);
+            return View(repo.Get單一筆部門資料(ID.Value));
         }
 
         [HttpPost]
@@ -55,48 +63,53 @@ namespace WebApplication3.Controllers
         {
             if (ModelState.IsValid)
             {
-                var item = db.Department.Find(ID);
+                var item = repo.Get單一筆部門資料(ID);
                 item.InjectFrom(department);
                 //item.Name = department.Name;
                 //item.Budget = department.Budget;
                 //item.StartDate = department.StartDate;
                 //item.InstructorID = department.InstructorID;
-                db.SaveChanges();
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            var dept = db.Department.Find(ID);
-            ViewBag.InstructorID = new SelectList(db.Person, "ID", "FirstName", dept.InstructorID);
+            var dept = repo.Get單一筆部門資料(ID);
+            ViewBag.InstructorID = new SelectList(repoPerson.All(), "ID", "FirstName", dept.InstructorID);
             return View(dept);
         }
         public ActionResult Details(int? ID)
         {
-            if (!ID.HasValue)
+            if (ID == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var dept = repo.Get單一筆部門資料(ID.Value);
+            if (dept == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.InstructorID = new SelectList(db.Person, "ID", "FirstName");
-            return View(db.Department.Find(ID));
+            return View(dept);
         }
-        public ActionResult Delete(int? ID)
+        public ActionResult Delete(int? id)
         {
-            if (!ID.HasValue)
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var dept = repo.Get單一筆部門資料(id.Value);
+            if (dept == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.InstructorID = new SelectList(db.Person, "ID", "FirstName");
-            return View(db.Department.Find(ID));
+            return View(dept);
         }
         [HttpPost]
         public ActionResult Delete(int ID, Department department)
         {
-            if (ModelState.IsValid)
-            {
-                var item = db.Department.Find(ID);
-                db.Department.Remove(item);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+            var item = repo.Get單一筆部門資料(ID);
+            repo.Delete(item);
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
+
         }
 
     }

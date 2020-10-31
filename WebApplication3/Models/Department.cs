@@ -26,6 +26,7 @@ namespace WebApplication3.Models
         public Nullable<System.DateTime> StartDate { get; set; }
         public Nullable<int> InstructorID { get; set; }
         public byte[] RowVersion { get; set; }
+        public bool isDeleted { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Course> Course { get; set; }
