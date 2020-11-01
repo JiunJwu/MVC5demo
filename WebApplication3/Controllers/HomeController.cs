@@ -33,6 +33,7 @@ namespace WebApplication3.Controllers
 #if !DEBUG
         [NonAction]
 #endif
+        [LocalOnly]
         public ActionResult Debug()
         {
             return Content("DEBUG");
