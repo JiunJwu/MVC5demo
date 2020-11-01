@@ -47,6 +47,7 @@ namespace WebApplication3.Controllers
         {
             ViewData.Model = repoCourse.All();
             ViewBag.IsEditMode = IsEditMode;
+            ViewBag.DepartmentList = repo.All().Select(p => new { p.DepartmentID, p.Name }).ToList();
             return View();
         }
  
@@ -65,6 +66,7 @@ namespace WebApplication3.Controllers
                 return RedirectToAction("CourseBatchEdit");
             }
             ViewBag.IsEditMode = IsEditMode;
+            ViewBag.DepartmentID = new SelectList(repo.All(), "DepartmentID", "Name");
             return View(repoCourse.All());
         }
     }

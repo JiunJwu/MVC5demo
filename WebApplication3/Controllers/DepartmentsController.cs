@@ -103,7 +103,8 @@ namespace WebApplication3.Controllers
             return View(dept);
         }
         [HttpPost]
-        public ActionResult Delete(int ID, Department department)
+        [ActionName("Delete")]
+        public ActionResult Delete(int ID)
         {
             var item = repo.Get單一筆部門資料(ID);
             repo.Delete(item);
