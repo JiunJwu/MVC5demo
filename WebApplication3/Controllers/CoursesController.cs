@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -86,6 +87,7 @@ namespace WebApplication3.Controllers
         // 詳細資訊，請參閱 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [HandleError(ExceptionType =typeof(DbEntityValidationException),View = "ErrorDbEntityValidationException")]
         public ActionResult Edit(CourseCreateOrEdit course)
         {
             if (ModelState.IsValid)
