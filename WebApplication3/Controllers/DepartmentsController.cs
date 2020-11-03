@@ -14,11 +14,13 @@ namespace WebApplication3.Controllers
         //ContosoUniversityEntities db = new ContosoUniversityEntities();
         DepartmentRepository repo;
         PersonRepository repoPerson;
+        CourseRepository repoCourse;
 
         public DepartmentsController()
         {
             repo = RepositoryHelper.GetDepartmentRepository();
             repoPerson = RepositoryHelper.GetPersonRepository(repo.UnitOfWork);
+            repoCourse = RepositoryHelper.GetCourseRepository(repo.UnitOfWork);
         }
 
         // GET: Department
@@ -89,6 +91,13 @@ namespace WebApplication3.Controllers
             }
             return View(dept);
         }
+
+        public ActionResult CoursesUnderDetails(int id)
+        {
+            var data = repoCourse.All().Where(p => p.DepartmentID == id);
+            return PartialView(data);
+        }
+
         public ActionResult Delete(int? id)
         {
             if (id == null)
